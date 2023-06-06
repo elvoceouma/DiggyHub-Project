@@ -1,4 +1,4 @@
-
+import mysql.connector
 from flask import Flask, render_template, request, redirect, flash
 from database import connect_to_database, save_receipt, send_whatsapp_receipt, send_email_receipt
 
