@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Send Receipt</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Send Receipt</h1>
+
+    <h3>Receipt ID: {{ receipt_id }}</h3>
+
+    <form action="/send_receipt/{{ receipt_id }}" method="POST">
+        <label for="delivery_method">Delivery Method:</label>
+        <select name="delivery_method" id="delivery_method">
+            <option value="whatsapp">WhatsApp</option>
+            <option value="email">Email</option>
+        </select>
+
+        <div id="recipient_input">
+            <label for="recipient">Recipient:</label>
+            <input type="text" name="recipient" id="recipient">
+        </div>
+
+        <button type="submit">Send Receipt</button>
+    </form>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
