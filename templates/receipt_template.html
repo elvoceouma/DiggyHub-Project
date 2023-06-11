@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Receipt Template</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <style>
+    /* Define the styles for the receipt template */
+    /* Reset default margin and padding */
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    ol,
+    ul {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Set default font styles */
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* Define styles for the receipt template */
+    .receipt {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+    }
+
+    .receipt h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+      text-transform: uppercase;
+    }
+
+    .business-info h2 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+
+    .purchase-info h2,
+    .payment-info h2,
+    .purchase-date h2,
+    .receipt-number h2 {
+      margin-top: 30px;
+      font-size: 16px;
+      text-transform: uppercase;
+    }
+
+    .purchase-info p,
+    .payment-info p,
+    .purchase-date p,
+    .receipt-number p {
+      margin: 5px 0;
+      line-height: 1.5;
+    }
+
+    .receipt-number p {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    /* Customize the receipt template to look like a printed receipt */
+    .receipt {
+      background-color: #f5f5f5;
+    }
+
+    .receipt h1 {
+      font-size: 28px;
+    }
+
+    .receipt h2 {
+      font-size: 18px;
+    }
+
+    .receipt p {
+      font-size: 14px;
+    }
+
+    .receipt-number p {
+      font-size: 22px;
+    }
+
+    /* Add more CSS styles as required */
+
+    /* Add more CSS styles as required */
+  </style>
+  <body>
+    <div class="receipt">
+      <h1>Receipt</h1>
+      <div class="business-info">
+        <h2>{{ business_name }}</h2>
+        <p>{{ business_address }}</p>
+        <p>Phone: {{ phone_number }}</p>
+        <p>Email: {{ email_address }}</p>
+      </div>
+      <div class="purchase-info">
+        <h2>Purchase Information</h2>
+        <p><strong>Product Description:</strong> {{ product_description }}</p>
+        <p><strong>SKU:</strong> {{ sku }}</p>
+        <p><strong>Quantity:</strong> {{ quantity }}</p>
+      </div>
+      <div class="payment-info">
+        <h2>Payment Details</h2>
+        <p><strong>Amount Due:</strong> {{ amount_due }}</p>
+        <p><strong>Payment Method:</strong> {{ payment_method }}</p>
+      </div>
+      <div class="purchase-date">
+        <h2>Purchase Date</h2>
+        <p><strong>Date:</strong> {{ purchase_date }}</p>
+        <p><strong>Time:</strong> {{ purchase_time }}</p>
+        <p><strong>Employee Number:</strong> {{ employee_number }}</p>
+      </div>
+      <div class="receipt-number">
+        <h2>Receipt Number</h2>
+        <p>{{ receipt_number }}</p>
+      </div>
+    </div>
+  </body>
+</html>

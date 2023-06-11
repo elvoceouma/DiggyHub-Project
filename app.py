@@ -41,17 +41,40 @@ def send_email_receipt():
 def generate_receipt():
     transaction_data = {
         'customer_name': request.form['customer_name'],
+        'business_name': request.form['business_name'],
+        'business_address': request.form['business_address'],
+        'phone_number': request.form['phone_number'],
+        'email_address': request.form['email_address'],
+        'product_description': request.form['product_description'],
+        'sku': request.form['sku'],
+        'quantity': request.form['quantity'],
+        'amount_due': request.form['amount_due'],
+        'payment_method': request.form['payment_method'],
         'purchase_date': request.form['purchase_date'],
-        # Add more transaction data fields as required
+        'purchase_time': request.form['purchase_time'],
+        'employee_number': request.form['employee_number'],
+        'receipt_number': request.form['receipt_number']
     }
 
-    # Save receipt details in the database
-    receipt_id = save_receipt(transaction_data)
+    # Generate the receipt using the transaction_data
 
-    # Redirect to choose delivery method
-    return redirect(f'/send_receipt/{receipt_id}')
+    # Replace the following print statements with your code to generate the receipt
+    print('Customer Name:', transaction_data['customer_name'])
+    print('Business Name:', transaction_data['business_name'])
+    print('Business Address:', transaction_data['business_address'])
+    print('Phone Number:', transaction_data['phone_number'])
+    print('Email Address:', transaction_data['email_address'])
+    print('Product Description:', transaction_data['product_description'])
+    print('SKU:', transaction_data['sku'])
+    print('Quantity:', transaction_data['quantity'])
+    print('Amount Due:', transaction_data['amount_due'])
+    print('Payment Method:', transaction_data['payment_method'])
+    print('Purchase Date:', transaction_data['purchase_date'])
+    print('Purchase Time:', transaction_data['purchase_time'])
+    print('Employee Number:', transaction_data['employee_number'])
+    print('Receipt Number:', transaction_data['receipt_number'])
 
-# Send receipt route
+    return render_template('receipt_template.html', **transaction_data)
 
 
 @app.route('/send_receipt/<receipt_id>', methods=['GET', 'POST'])
