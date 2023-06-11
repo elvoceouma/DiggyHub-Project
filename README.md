@@ -20,9 +20,7 @@ This project aims to implement a system for generating digital receipts to repla
 
 1. Clone the repository:
 
-   ```shell
-   git clone https://github.com/your-username/digital-receipt-system.git
-   ```
+   git clone https://github.com/your-username/digital-receipt-system.git](https://github.com/elvoceouma/DiggyHub-Project.git
 
 2. Install the project dependencies:
 
