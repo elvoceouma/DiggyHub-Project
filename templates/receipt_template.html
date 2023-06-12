@@ -35,11 +35,19 @@
     /* Define styles for the receipt template */
     .logo {
       position: relative;
-      top: 10px;
-      left: 10px;
-      width: 100px; /* Adjust the width as needed */
+      right: 10px;
+      width: 50px;
+      flex: 30%;
     }
 
+    .newspaper {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .business-info {
+      flex: 70%;
+    }
     .receipt {
       max-width: 500px;
       margin: 0 auto;
@@ -104,13 +112,11 @@
     }
 
     .newspaper {
-      column-count: 2;
-      column-gap: 40px;
-      column-rule-style: solid;
+      display: flex;
     }
 
     .barcode {
-      position: absolute;
+      position: relative;
       bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
@@ -128,13 +134,14 @@
           <p>{{ business_address }}</p>
           <p>Phone: {{ phone_number }}</p>
           <p>Email: {{ email_address }}</p>
-          <img
-            src="{{ url_for('static', filename='logo.png') }}"
-            class="logo"
-            alt="Company Logo"
-          />
         </div>
+        <img
+          src="{{ url_for('static', filename='logo.png') }}"
+          class="logo"
+          alt="Company Logo"
+        />
       </div>
+
       <div class="purchase-info">
         <h2>Purchase Information</h2>
         <p><strong>Product Description:</strong> {{ product_description }}</p>
@@ -151,12 +158,11 @@
         <p><strong>Date:</strong> {{ purchase_date }}</p>
         <p><strong>Time:</strong> {{ purchase_time }}</p>
         <p><strong>Employee Number:</strong> {{ employee_number }}</p>
+        <p><strong>Receipt Number:</strong>{{ receipt_number }}</p>
       </div>
-      <div class="receipt-number">
-        <h2>Receipt Number</h2>
-        <p>{{ receipt_number }}</p>
-      </div>
+      <div class="receipt-number"></div>
       <img
+        class="barcode"
         src="data:image/png;base64,{{ barcode_image|b64encode }}"
         alt="Barcode"
       />

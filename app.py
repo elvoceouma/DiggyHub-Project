@@ -10,9 +10,10 @@ import base64
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key"  # Replace with your own secret key
-receipt_number = 1
 
-# defining a custom filter for base64 encoding
+receipt_number = 0
+
+# Defining a custom filter for base64 encoding
 
 
 @app.template_filter('b64encode')
@@ -20,8 +21,6 @@ def base64_encode(value):
     encoded_bytes = base64.b64encode(value)
     encoded_string = encoded_bytes.decode('utf-8')
     return encoded_string
-
-# Home page route
 
 
 @app.route('/')
@@ -31,7 +30,6 @@ def home():
 
 @app.route('/generate_receipt', methods=['POST'])
 def generate_receipt():
-
     global receipt_number
 
     current_date = datetime.now().strftime("%Y-%m-%d")
@@ -53,15 +51,11 @@ def generate_receipt():
         'employee_number': request.form['employee_number'],
         'receipt_number': receipt_number,
     }
-    barcode_value = f"RECEIPT{receipt_number}"
 
-    # Generate the receipt using the transaction_data
-    receipt_number = request.form.get('recipient_number')
-    customer_name = request.form['customer_name']
-
-    print(transaction_data)
-    barcode_image = generate_barcode_image(barcode_value)
+    barcode_value = f"RECEIPT-{current_date}-{receipt_number}"
     receipt_number += 1
+
+    barcode_image = generate_barcode_image(barcode_value)
 
     return render_template('receipt_template.html', **transaction_data, current_date=current_date, current_time=current_time, barcode_image=barcode_image)
 
@@ -72,7 +66,6 @@ def generate_barcode_image(barcode_value):
     code128.write(stream)
     stream.seek(0)
     return stream.getvalue()
-# Generate receipt route
 
 
 @app.route('/save-receipt', methods=['POST'])
