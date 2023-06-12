@@ -27,12 +27,19 @@
 
     /* Set default font styles */
     body {
-      font-family: Arial, sans-serif;
+      font-family: monaco, Consolas, Lucida Console, monospace;
       font-size: 14px;
       line-height: 1.5;
     }
 
     /* Define styles for the receipt template */
+    .logo {
+      position: relative;
+      top: 10px;
+      left: 10px;
+      width: 100px; /* Adjust the width as needed */
+    }
+
     .receipt {
       max-width: 500px;
       margin: 0 auto;
@@ -96,18 +103,37 @@
       font-size: 22px;
     }
 
-    /* Add more CSS styles as required */
+    .newspaper {
+      column-count: 2;
+      column-gap: 40px;
+      column-rule-style: solid;
+    }
 
-    /* Add more CSS styles as required */
+    .barcode {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px; /* Adjust the width as needed */
+    }
   </style>
+
   <body>
     <div class="receipt">
       <h1>Receipt</h1>
-      <div class="business-info">
-        <h2>{{ business_name }}</h2>
-        <p>{{ business_address }}</p>
-        <p>Phone: {{ phone_number }}</p>
-        <p>Email: {{ email_address }}</p>
+
+      <div class="newspaper">
+        <div class="business-info">
+          <h2>{{ business_name }}</h2>
+          <p>{{ business_address }}</p>
+          <p>Phone: {{ phone_number }}</p>
+          <p>Email: {{ email_address }}</p>
+          <img
+            src="{{ url_for('static', filename='logo.png') }}"
+            class="logo"
+            alt="Company Logo"
+          />
+        </div>
       </div>
       <div class="purchase-info">
         <h2>Purchase Information</h2>
@@ -130,6 +156,10 @@
         <h2>Receipt Number</h2>
         <p>{{ receipt_number }}</p>
       </div>
+      <img
+        src="data:image/png;base64,{{ barcode_image|b64encode }}"
+        alt="Barcode"
+      />
     </div>
   </body>
 </html>

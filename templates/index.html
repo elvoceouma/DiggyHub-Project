@@ -54,16 +54,37 @@
       <input type="text" name="payment_method" id="payment_method" required />
 
       <label for="purchase_date">Purchase Date:</label>
-      <input type="date" name="purchase_date" id="purchase_date" required />
+      <input
+        type="date"
+        name="purchase_date"
+        id="purchase_date"
+        value="{{ current_date }}"
+        required
+        readonly
+      />
 
       <label for="purchase_time">Purchase Time:</label>
-      <input type="time" name="purchase_time" id="purchase_time" required />
+      <input
+        type="time"
+        name="purchase_time"
+        id="purchase_time"
+        value="{{current_time}}"
+        required
+        readonly
+      />
 
       <label for="employee_number">Employee Number:</label>
       <input type="text" name="employee_number" id="employee_number" required />
 
       <label for="receipt_number">Receipt Number:</label>
-      <input type="text" name="receipt_number" id="receipt_number" required />
+      <input
+        type="text"
+        name="receipt_number"
+        id="receipt_number"
+        value="{{ receipt_number }}"
+        required
+        readonly
+      />
 
       <button type="submit">Generate Receipt</button>
     </form>
