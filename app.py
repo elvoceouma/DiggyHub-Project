@@ -1,6 +1,5 @@
 import mysql.connector
-from flask import Flask, Response, render_template, request, redirect, flash, jsonify, render_template_string
-from database import connect_to_database, save_receipt, send_whatsapp_receipt, send_email_receipt, get_receipt
+from flask import Flask, Response, render_template, request, redirect, flash, jsonify, send_file
 from datetime import datetime
 from barcode import Code128
 from barcode.writer import ImageWriter
@@ -11,11 +10,9 @@ import pdfkit
 
 
 app = Flask(__name__)
-app.secret_key = "your-secret-key"  # Replace  secret key later
-
+app.secret_key = "your-secret-key"  # Replace secret key later
+options = {"enable-local-file-access": ""}
 receipt_number = 20636
-
-# Defining a custom filter for base64 encoding
 
 
 @app.template_filter('b64encode')
@@ -60,10 +57,10 @@ def generate_receipt():
     barcode_image = generate_barcode_image(barcode_value)
     html_content = render_template('receipt_template.html', **transaction_data,
                                    current_date=current_date, current_time=current_time, barcode_image=barcode_image)
-    output_path = '/path/to/output/receipt.pdf'
+    output_path = '/home/elvice/DiggyHub-Project/stored_receipts/receipt.pdf'
     if convert_to_pdf(html_content, output_path):
         # Redirect to the PDF receipt route
-        return redirect('http://127.0.0.1:5000/generate_receipt'('pdf_receipt'))
+        return redirect('/pdf_receipt')
     else:
         return "Failed to generate PDF receipt."
 
@@ -76,12 +73,9 @@ def generate_barcode_image(barcode_value):
     return stream.getvalue()
 
 
-# Create a PDF file from the HTML content
-
-
 def convert_to_pdf(html_content, output_path):
     try:
-        pdfkit.from_string(html_content, output_path)
+        pdfkit.from_string(html_content, output_path, options=options)
         return True
     except Exception as e:
         print(f"PDF Conversion failed: {str(e)}")
@@ -90,7 +84,7 @@ def convert_to_pdf(html_content, output_path):
 
 @app.route('/pdf_receipt')
 def pdf_receipt():
-    pdf_path = '/home/elvice/DiggyHub-Project/stored_receipts'
+    pdf_path = '/home/elvice/DiggyHub-Project/stored_receipts/receipt.pdf'
     return send_file(pdf_path, mimetype='application/pdf')
 
 
