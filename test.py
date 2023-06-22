@@ -1,8 +1,4 @@
 import wkhtmltopdf
-from wkhtmltopdf.main import WKHtmlToPdf
+from wkhtmltopdf import WKhtmlToPdf
 
-wkhtmltopdf = wkhtmltopdf(
-    url='http://www.google.com',
-    output_file='./example.pdf',
-)
-wkhtmltopdf.render()
+pdfkit.from_url('https://google.com', 'google.pdf')
