@@ -6,12 +6,14 @@ from barcode import Code128
 from barcode.writer import ImageWriter
 from io import BytesIO
 import base64
+import time
+import pdfkit
 
 
 app = Flask(__name__)
-app.secret_key = "your-secret-key"  # Replace with your own secret key
+app.secret_key = "your-secret-key"  # Replace  secret key later
 
-receipt_number = 0
+receipt_number = 20636
 
 # Defining a custom filter for base64 encoding
 
@@ -56,8 +58,14 @@ def generate_receipt():
     receipt_number += 1
 
     barcode_image = generate_barcode_image(barcode_value)
-
-    return render_template('receipt_template.html', **transaction_data, current_date=current_date, current_time=current_time, barcode_image=barcode_image)
+    html_content = render_template('receipt_template.html', **transaction_data,
+                                   current_date=current_date, current_time=current_time, barcode_image=barcode_image)
+    output_path = '/path/to/output/receipt.pdf'
+    if convert_to_pdf(html_content, output_path):
+        # Redirect to the PDF receipt route
+        return redirect('http://127.0.0.1:5000/generate_receipt'('pdf_receipt'))
+    else:
+        return "Failed to generate PDF receipt."
 
 
 def generate_barcode_image(barcode_value):
@@ -66,6 +74,24 @@ def generate_barcode_image(barcode_value):
     code128.write(stream)
     stream.seek(0)
     return stream.getvalue()
+
+
+# Create a PDF file from the HTML content
+
+
+def convert_to_pdf(html_content, output_path):
+    try:
+        pdfkit.from_string(html_content, output_path)
+        return True
+    except Exception as e:
+        print(f"PDF Conversion failed: {str(e)}")
+        return False
+
+
+@app.route('/pdf_receipt')
+def pdf_receipt():
+    pdf_path = '/home/elvice/DiggyHub-Project/stored_receipts'
+    return send_file(pdf_path, mimetype='application/pdf')
 
 
 @app.route('/save-receipt', methods=['POST'])
@@ -113,4 +139,8 @@ def send_receipt(receipt_id):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     app.run(debug=True)
+    end_time = time.time()
+    runtime = end_time - start_time
+    print(f"Runtime: {runtime} seconds")
