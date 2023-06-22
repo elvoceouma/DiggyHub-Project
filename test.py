@@ -1,6 +1,7 @@
-from wkhtmltopdf import WKHtmlToPdf
+import wkhtmltopdf
+from wkhtmltopdf.main import WKHtmlToPdf
 
-wkhtmltopdf = WKHtmlToPdf(
+wkhtmltopdf = wkhtmltopdf(
     url='http://www.google.com',
     output_file='./example.pdf',
 )
