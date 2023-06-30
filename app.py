@@ -5,14 +5,21 @@ from barcode import Code128
 from barcode.writer import ImageWriter
 from io import BytesIO
 import base64
-import time
 import pdfkit
+import os
+from twilio.rest import Client
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+import smtplib
 
 
 app = Flask(__name__)
 app.secret_key = "your-secret-key"  # Replace secret key later
 options = {"enable-local-file-access": ""}
 receipt_number = 20636
+BASE_DIR = os.getcwd()
+RECEIPT_DIR = os.path.join(BASE_DIR, 'stored_receipts')
 
 
 @app.template_filter('b64encode')
@@ -30,6 +37,7 @@ def home():
 @app.route('/generate_receipt', methods=['POST'])
 def generate_receipt():
     global receipt_number
+    global output_path
 
     current_date = datetime.now().strftime("%Y-%m-%d")
     current_time = datetime.now().strftime("%H:%M:%S")
@@ -53,14 +61,18 @@ def generate_receipt():
 
     barcode_value = f"RECEIPT-{current_date}-{receipt_number}"
     receipt_number += 1
-
     barcode_image = generate_barcode_image(barcode_value)
     html_content = render_template('receipt_template.html', **transaction_data,
                                    current_date=current_date, current_time=current_time, barcode_image=barcode_image)
-    output_path = '/home/elvice/DiggyHub-Project/stored_receipts/receipt.pdf'
+
+    output_path = os.path.join(RECEIPT_DIR, f'{barcode_value}.pdf')
+
     if convert_to_pdf(html_content, output_path):
+        # Call the send_email_receipt function
+        send_whatsapp_receipt(transaction_data, output_path,
+                              barcode_value)
         # Redirect to the PDF receipt route
-        return redirect('/pdf_receipt')
+        return redirect(f'/pdf_receipt?barcode_value={barcode_value}')
     else:
         return "Failed to generate PDF receipt."
 
@@ -75,6 +87,7 @@ def generate_barcode_image(barcode_value):
 
 def convert_to_pdf(html_content, output_path):
     try:
+
         pdfkit.from_string(html_content, output_path, options=options)
         return True
     except Exception as e:
@@ -84,8 +97,88 @@ def convert_to_pdf(html_content, output_path):
 
 @app.route('/pdf_receipt')
 def pdf_receipt():
-    pdf_path = '/home/elvice/DiggyHub-Project/stored_receipts/receipt.pdf'
+    barcode_value = request.args.get('barcode_value')
+    pdf_path = os.path.join(RECEIPT_DIR, f'{barcode_value}.pdf')
     return send_file(pdf_path, mimetype='application/pdf')
+
+# Route for sending the receipt via WhatsApp
+
+
+@app.route('/send-whatsapp-receipt', methods=['POST'])
+def send_whatsapp_receipt(transaction_data, pdf_path, recipient_phone,):
+    # barcode_value = request.args.get('barcode_value')
+    # pdf_path = os.path.join(RECEIPT_DIR, f'{barcode_value}.pdf')
+    recipient_phone = request.form['phone_number']
+    transaction_date = datetime.now().strftime("%Y-%m-%dT%H:%M")
+    customer_name = transaction_data['customer_name']
+    account_sid = 'AC8a097e5a69c07fb78f01bcc2ba37316e'
+    auth_token = 'de452883fdbf898de9f6dd1d8daf7298'
+    client = Client(account_sid, auth_token)
+    from_whatsapp_number = 'whatsapp:+14155238886',  # Twilio sandbox WhatsApp number
+    # Recipient's WhatsApp number
+    to_whatsapp_number = f'whatsapp:{recipient_phone}'
+    message_body = f"Dear {customer_name},\n\nThank you for your recent purchase! We're delighted to share your receipt with you. Please find it attached.\n\nIf you have any questions or need further assistance, feel free to reach out to our customer support team.\n\nBest regards,\nDiggyHub Company \n\n{transaction_data}"
+    message = client.messages.create(
+        from_=from_whatsapp_number,
+        body=message_body,
+        media_url=[
+            'https://sitemate.com/wp-content/uploads/2019/04/2019-04-01-Example-Template-Project-Field-Service-Report-1-page-001.jpg'],
+        to=to_whatsapp_number
+    )
+
+    if message.sid:
+        return True
+    else:
+        return False
+
+
+@app.route('/send-email-receipt', methods=['POST'])
+def send_email_receipt(transaction_data, pdf_path):
+    # Handle receipt data and recipient information
+    email_subject = "Receipt"
+    email_body = "Please find attached the receipt."
+    sender_email = transaction_data['business_address']
+    recipient_email = transaction_data['email_address']
+
+    # Rest of the function code...
+
+    # Create the email message
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = recipient_email
+    message['Subject'] = email_subject
+    message['Body'] = email_body
+
+    # Attach the PDF receipt
+    with open(pdf_path, 'rb') as attachment:
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment',
+                        filename='receipt.pdf')
+        message.attach(part)
+
+    # Connect to the SMTP server and send the email
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 465
+    smtp_username = "elviceoumaonyango@gmail.com"
+    smtp_password = "@Elvice.Dev"
+
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.send_message(message)
+
+    return "Receipt sent via email."
+# def send_whatsapp_receipt():
+#
+#    # Use the send_whatsapp_receipt function to send the receipt via WhatsApp
+#    if send_whatsapp_receipt(pdf_path, recipient_phone):
+#        flash('Receipt sent via WhatsApp!')
+#    else:
+#        flash('Failed to send receipt via WhatsApp.')
+#
+#    return redirect('/')
 
 
 @app.route('/save-receipt', methods=['POST'])
@@ -96,17 +189,17 @@ def save_receipt():
     # ...
 
 
-@app.route('/send-whatsapp-receipt', methods=['POST'])
-def send_whatsapp_receipt():
-    # Handle receipt data
-    data = request.get_json()
+# @app.route('/send-whatsapp-receipt', methods=['POST'])
+# def send_whatsapp_receipt():
+#    # Handle receipt data
+#    data = request.get_json()
 
 
-@app.route('/send-email-receipt', methods=['POST'])
-def send_email_receipt():
-    # Handle receipt data
-    if __name__ == '__main__':
-        data = request.get_json()
+# @app.route('/send-email-receipt', methods=['POST'])
+# def send_email_receipt():
+#    # Handle receipt data
+#    if __name__ == '__main__':
+#        data = request.get_json()
 
 
 @app.route('/send_receipt/<receipt_id>', methods=['GET', 'POST'])
@@ -133,8 +226,4 @@ def send_receipt(receipt_id):
 
 
 if __name__ == '__main__':
-    start_time = time.time()
     app.run(debug=True)
-    end_time = time.time()
-    runtime = end_time - start_time
-    print(f"Runtime: {runtime} seconds")
