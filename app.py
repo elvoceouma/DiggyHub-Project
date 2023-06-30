@@ -12,10 +12,17 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 import smtplib
-
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-app.secret_key = "your-secret-key"  # Replace secret key later
+
+
+load_dotenv()
+app.secret_key = os.environ.get('APP_SECRET_KEY')
+twilio_account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+twilio_auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
+
+
 options = {"enable-local-file-access": ""}
 receipt_number = 20636
 BASE_DIR = os.getcwd()
@@ -111,8 +118,8 @@ def send_whatsapp_receipt(transaction_data, pdf_path, recipient_phone,):
     recipient_phone = request.form['phone_number']
     transaction_date = datetime.now().strftime("%Y-%m-%dT%H:%M")
     customer_name = transaction_data['customer_name']
-    account_sid = 'AC8a097e5a69c07fb78f01bcc2ba37316e'
-    auth_token = 'de452883fdbf898de9f6dd1d8daf7298'
+    account_sid = twilio_account_sid
+    auth_token = twilio_auth_token
     client = Client(account_sid, auth_token)
     from_whatsapp_number = 'whatsapp:+14155238886',  # Twilio sandbox WhatsApp number
     # Recipient's WhatsApp number
